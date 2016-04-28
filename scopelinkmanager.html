@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>Document</title>
+ </head>
+ <body>
+  <script type="text/javascript">
+  <!--
+		/*
+		dataNodeStructure
+		{"id":1,"desc":"","pid":0}
+	*/
+	function ScopeLinkManager(options){
+		this.scopeLinkArr =[];
+		this.scopeLinkIndex = {};
+		this.formatMap = null;
+		this.uniId='cid';
+		if(options){
+			this.scopeLinkArr = options.data;
+		}
+	}
+	ScopeLinkManager.prototype={
+		init:function(){
+			//get initial data
+			this.formatMap = this.dataFormat();
+			this.updateIndex();
+			//return this.formatArr[0];
+			console.log(this.formatMap);
+			console.log(this.scopeLinkIndex);
+			return this.formatMap["0"];
+		},
+		dataFormat:function(){
+			//
+			var tempArr ={},tempData = this.scopeLinkArr,temp,property;
+			for(var i=0;i<tempData.length;i++){
+				temp = tempData[i];
+				property = temp.pid.toString();
+				if(tempArr.hasOwnProperty(property)){
+					tempArr[property].push(temp);
+				}else{
+					tempArr[property] = [];
+					tempArr[property].push(temp);
+				}
+			}
+			return tempArr;
+		},
+		getNodeById:function(id){
+			//check scopeLinkIndex getFromScopeLinkArr
+			var index = 0;
+			if(this.scopeLinkIndex.hasOwnProperty(id)){
+				index = this.scopeLinkIndex[id];
+				return this.scopeLinkArr[index];
+			}else
+				return null;
+		},
+		updateIndex:function(){
+			//遍历linkArr 生成 id  ==> index 对照表
+			var tempArr = this.scopeLinkArr,tag=this.uniId;
+			var map ={};
+			for(var i=0;i<tempArr.length;i++){
+				map[tempArr[i][tag]] = i;
+			}
+			this.scopeLinkIndex = map;
+		},
+		getLevel:function(id){
+			//根据id获取到下一级的数据
+			var nodeInfo = this.getNodeById(id);
+			return this.getData(id);
+		},
+		getData:function(id){
+			//根据当前配置的是从服务器获取，还是初始化数据，这里直接初始化数据
+			if(this.formatMap.hasOwnProperty(id))
+				return this.formatMap[id];
+			else
+				return null;
+		}
+	}
+
+	var dataTest = [{cid:1,desc:"x",pid:0},{cid:2,desc:"y",pid:5},{cid:3,desc:"z",pid:2},{cid:4,desc:"a",pid:1},{cid:5,desc:"b",pid:1}];
+	var scopeLinkManager = new ScopeLinkManager({data:dataTest});
+	var dataLevel = scopeLinkManager.init();
+	console.log(dataLevel);
+	console.log(scopeLinkManager.getNodeById("5"));
+  //-->
+  </script>
+ </body>
+</html>
